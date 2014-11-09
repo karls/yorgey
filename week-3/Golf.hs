@@ -28,16 +28,20 @@ partitions xs = map (\x -> (drop (x - 3) . take x) xs) [3..(length xs)]
 
 -- |Ex3 - Histogram
 -------------------
-frequencies :: [Integer] -> [(Integer, Int)]
-frequencies xs = map (\l@(x:_) -> (x, length l)) $ groupBy (\x y -> x == y) $ sort xs
-
-produceColumn :: Int -> Maybe Int -> [String]
-produceColumn m Nothing = [" " | _ <- [1..m]]
-produceColumn m (Just x) = reverse (["*" | _ <- [1..x]] ++ [" " | _ <- [1..(m-x)]])
-
 histogram :: [Integer] -> String
 histogram xs = concat $ intersperse "\n" $ map concat ls
   where
-    freqs = frequencies xs
-    m = snd $ maximumBy (\(_,x2) (_,y2) -> x2 `compare` y2) freqs
-    ls = transpose [(produceColumn m (lookup y freqs)) ++ ["=",(show y)] | y <- [0..9]]
+    fs = frequencies xs
+    m  = maximum (map snd fs)
+    ls = transpose [column y m (lookup y fs) | y <- [0..9]]
+
+frequencies :: [Integer] -> [(Integer, Integer)]
+frequencies = elemAndCount . groupBy (==) . sort
+  where
+    elemAndCount = map (\l -> (head l, (fromIntegral . length) l))
+
+column :: Integer -> Integer -> Maybe Integer -> [String]
+column n m Nothing  =
+  reverse ([show n] ++ ["="] ++ [" " | _ <- [1..m]])
+column n m (Just x) =
+  reverse ([show n] ++ ["="] ++ ["*" | _ <- [1..x]] ++ [" " | _ <- [1..(m-x)]])
