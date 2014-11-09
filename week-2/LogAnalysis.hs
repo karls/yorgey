@@ -33,7 +33,7 @@ build = foldr insert Leaf
 
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) mt           = mt
--- that's a bit of a weird pattern match, but makes -Wall not complain
+-- that's a bit of a weird pattern match, but makes -Wall stop complaining
 insert _ (Node _ (Unknown _) _) = undefined
 insert lm Leaf                  = Node Leaf lm Leaf
 insert lm1@(LogMessage _ t1 _) tree@(Node l lm2@(LogMessage _ t2 _) r)
